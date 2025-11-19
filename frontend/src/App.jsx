@@ -7,12 +7,13 @@ import Tasks from "./pages/Tasks";
 import Sidebar from "./components/Sidebar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProjectDetails from "./pages/ProjectDetails";
+import Profile from "./pages/Profile"
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Default redirect */}
+       
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<AuthPage />} />
 
@@ -76,6 +77,7 @@ function App() {
               <div className="flex min-h-screen bg-gray-100">
                 <Sidebar />
                 <MemberDashboard />
+              
               </div>
             </ProtectedRoute>
           }
@@ -89,6 +91,17 @@ function App() {
               <div className="flex min-h-screen bg-gray-100">
                 <Sidebar />
                 <Tasks />
+              </div>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/member/profile"
+          element={
+            <ProtectedRoute requiredRole="member">
+              <div className="flex min-h-screen bg-gray-100">
+                <Sidebar />
+                <Profile/>
               </div>
             </ProtectedRoute>
           }

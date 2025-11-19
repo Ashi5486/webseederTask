@@ -49,7 +49,7 @@ const Profile = () => {
       console.error("Error updating profile:", err);
     }
   };
-
+  console.log(avatar+"",user)
   return (
     <div className="p-6 flex-1 max-w-xl mx-auto">
       <h2 className="text-2xl font-bold mb-6">My Profile</h2>
@@ -59,25 +59,55 @@ const Profile = () => {
         className="bg-white p-6 rounded shadow space-y-4"
       >
         {/* Avatar */}
-        <div className="flex items-center gap-4">
-          <img
-            src={
-              user.avatarUrl
-                ? `http://localhost:5000/uploads/${user.avatarUrl}`
-                : "https://via.placeholder.com/100"
-            }
-            alt="avatar"
-            className="w-24 h-24 rounded-full object-cover border"
-          />
-          <div>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setAvatar(e.target.files[0])}
-              className="mb-2"
-            />
-          </div>
-        </div>
+       <div className="relative w-24 h-24">
+  {/* Image */}
+  <img
+    src={
+      user.avatar
+        ? `http://localhost:5000/uploads/${user.avatar}`
+        : "https://via.placeholder.com/100"
+    }
+    alt="avatar"
+    className="w-24 h-24 rounded-full object-cover border relative z-10"
+  />
+
+  {/* Hidden file input */}
+  <input
+    id="avatar"
+    name="avatar"
+    type="file"
+    accept="image/*"
+    className="hidden"
+    onChange={(e) => setAvatar(e.target.files[0])}
+  />
+  <label
+  htmlFor="avatar"
+  className="absolute inset-0 rounded-full bg-black/30 opacity-0 hover:opacity-100 
+             text-white flex items-center justify-center transition z-20 cursor-pointer"
+>
+  Change
+</label>
+
+  {/* Label behind the image */}
+  {!avatar && (
+    <label
+      htmlFor="avatar"
+      className="
+        absolute inset-0 
+        rounded-full 
+        bg-gray-200 
+        flex items-center justify-center
+        text-sm text-gray-600
+        z-0
+        cursor-pointer
+      "
+    >
+      Upload
+    </label>
+  )}
+  
+</div>
+
 
         {/* Name */}
         <div>

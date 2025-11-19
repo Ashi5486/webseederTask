@@ -22,10 +22,10 @@ export const updateProfile = async (req, res) => {
 
     if (req.file) {
       // Remove old avatar if exists
-      if (user.avatarUrl && fs.existsSync(path.join("uploads", user.avatarUrl))) {
-        fs.unlinkSync(path.join("uploads", user.avatarUrl));
+      if (user.avatar && fs.existsSync(path.join("uploads", user.avatar))) {
+        fs.unlinkSync(path.join("uploads", user.avatar));
       }
-      user.avatarUrl = req.file.filename; // store file name instead of full path
+      user.avatar = req.file.filename; // store file name instead of full path
     }
 
     // Optionally allow updating other fields (like name, email)

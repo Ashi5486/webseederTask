@@ -5,6 +5,7 @@ import {
   updateProject,
   deleteProject,
   getProjectsForMember,
+  assignMembers,
 } from "../controllers/projectController.js";
 import { protect, adminOnly, memberOnly } from "../middleware/authMiddleware.js";
 

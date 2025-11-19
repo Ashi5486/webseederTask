@@ -10,37 +10,42 @@ const AdminDashboard = () => {
   const [recentTasks, setRecentTasks] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const token = localStorage.getItem("token");
+  const headers = { Authorization: `Bearer ${token}` };
+
+  // Fetch Dashboard Data
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+
+      const [projectsRes, tasksRes, usersRes] = await Promise.all([
+        axios.get("http://localhost:5000/api/projects/all", { headers }), // FIXED
+        axios.get("http://localhost:5000/api/tasks", { headers }),
+        axios.get("http://localhost:5000/api/users", { headers }),
+      ]);
+
+      // Update statistics
+      setStats({
+        projects: projectsRes.data.length,
+        tasks: tasksRes.data.length,
+        users: usersRes.data.length,
+      });
+
+      // Sort latest 5 tasks
+      const sortedTasks = tasksRes.data
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 5);
+
+      setRecentTasks(sortedTasks);
+    } catch (error) {
+      console.error("Dashboard error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load data on start
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const headers = { Authorization: `Bearer ${token}` };
-
-        const [projectsRes, tasksRes, usersRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/projects", { headers }),
-          axios.get("http://localhost:5000/api/tasks", { headers }),
-          axios.get("http://localhost:5000/api/users", { headers }),
-        ]);
-
-        // Update counts
-        setStats({
-          projects: projectsRes.data.length,
-          tasks: tasksRes.data.length,
-          users: usersRes.data.length,
-        });
-
-        // Sort tasks by creation date and take latest 5
-        const sortedTasks = tasksRes.data
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-          .slice(0, 5);
-        setRecentTasks(sortedTasks);
-      } catch (error) {
-        console.error("Failed to load dashboard data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchDashboardData();
   }, []);
 
@@ -58,25 +63,28 @@ const AdminDashboard = () => {
         Admin Dashboard 👨‍💻
       </h1>
 
-      {/* Statistics */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 shadow rounded-xl text-center">
           <h3 className="text-gray-500 text-sm">Total Projects</h3>
           <p className="text-4xl font-bold text-blue-600">{stats.projects}</p>
         </div>
+
         <div className="bg-white p-6 shadow rounded-xl text-center">
           <h3 className="text-gray-500 text-sm">Total Tasks</h3>
           <p className="text-4xl font-bold text-green-600">{stats.tasks}</p>
         </div>
+
         <div className="bg-white p-6 shadow rounded-xl text-center">
           <h3 className="text-gray-500 text-sm">Total Members</h3>
           <p className="text-4xl font-bold text-purple-600">{stats.users}</p>
         </div>
       </div>
 
-      {/* Recent Tasks */}
+      Recent Tasks
       <div className="bg-white shadow rounded-xl p-6">
         <h2 className="text-2xl font-semibold mb-4">Recent Tasks</h2>
+
         {recentTasks.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full text-left">
@@ -88,13 +96,16 @@ const AdminDashboard = () => {
                   <th className="p-3">Created</th>
                 </tr>
               </thead>
+
               <tbody>
                 {recentTasks.map((task) => (
                   <tr key={task._id} className="border-b">
                     <td className="p-3">{task.title}</td>
+
                     <td className="p-3 text-gray-600 truncate max-w-xs">
                       {task.description}
                     </td>
+
                     <td className="p-3">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-semibold ${
@@ -108,6 +119,7 @@ const AdminDashboard = () => {
                         {task.status}
                       </span>
                     </td>
+
                     <td className="p-3 text-gray-500">
                       {new Date(task.createdAt).toLocaleDateString()}
                     </td>

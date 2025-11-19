@@ -7,6 +7,10 @@ const Tasks = () => {
   const [users, setUsers] = useState([]);
   const [editingTaskId, setEditingTaskId] = useState(null);
 
+// projects.map((item)=>{
+//     console.log(item);
+//   })
+
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -28,22 +32,36 @@ const Tasks = () => {
           : "http://localhost:5000/api/tasks/my-tasks";
       const { data } = await axios.get(url, { headers });
       setTasks(data);
+
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
   };
+  
+  // const fetchProjects = async () => {
+  //   try {
+  //     const { data } = await axios.get("http://localhost:5000/api/projects", {headers});
+  //     setProjects(data);
+  //     console.log(data)
+  //   } catch (error) {
+  //     console.error("Error fetching projects:", error);
+  //   }
+  // };
 
   const fetchProjects = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/projects", {
-        headers,
-      });
-      setProjects(data);
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-    }
-  };
+      const url =
+        role === "admin"
+          ? "http://localhost:5000/api/projects/all"
+          : "http://localhost:5000/api/projects";
 
+      const res = await axios.get(url, { headers });
+      setProjects(res.data);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load projects");
+    } 
+  };
   const fetchUsers = async () => {
     try {
       const { data } = await axios.get("http://localhost:5000/api/users", {
@@ -55,12 +73,18 @@ const Tasks = () => {
     }
   };
 
+  // 🔥 AUTO REFRESH LISTENER
   useEffect(() => {
     fetchTasks();
     if (role === "admin") {
       fetchProjects();
       fetchUsers();
     }
+
+    const refresh = () => fetchTasks();
+    window.addEventListener("dataUpdated", refresh);
+
+    return () => window.removeEventListener("dataUpdated", refresh);
   }, []);
 
   // Save task
@@ -85,7 +109,9 @@ const Tasks = () => {
         status: "Pending",
       });
       setEditingTaskId(null);
+
       fetchTasks();
+      window.dispatchEvent(new Event("dataUpdated")); // 🔥 notify others
     } catch (err) {
       console.error("Error saving task:", err);
     }
@@ -96,6 +122,7 @@ const Tasks = () => {
       try {
         await axios.delete(`http://localhost:5000/api/tasks/${id}`, { headers });
         fetchTasks();
+        window.dispatchEvent(new Event("dataUpdated")); // 🔥 notify others
       } catch (err) {
         console.error("Error deleting task:", err);
       }
@@ -133,6 +160,7 @@ const Tasks = () => {
         { headers }
       );
       fetchTasks();
+      window.dispatchEvent(new Event("dataUpdated")); // 🔥 notify others
     } catch (err) {
       console.error("Error updating status:", err);
     }
@@ -255,7 +283,9 @@ const Tasks = () => {
                   {role === "admin" && (
                     <th className="p-3 font-medium">Assigned To</th>
                   )}
+                  {role === "admin" && (
                   <th className="p-3 font-medium text-center">Actions</th>
+                  )}
                 </tr>
               </thead>
 
@@ -289,7 +319,7 @@ const Tasks = () => {
                     )}
 
                     <td className="p-3 text-center flex justify-center gap-2">
-                      {role === "admin" ? (
+                      {role === "admin" && (
                         <>
                           <button
                             onClick={() => handleEdit(task)}
@@ -304,8 +334,6 @@ const Tasks = () => {
                             Delete
                           </button>
                         </>
-                      ) : (
-                        <span className="text-gray-400">—</span>
                       )}
                     </td>
                   </tr>

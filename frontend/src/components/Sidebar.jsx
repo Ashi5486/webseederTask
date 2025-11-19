@@ -190,7 +190,7 @@ const Sidebar = () => {
   const navItems = role === "admin" ? adminNav : memberNav;
 
   return (
-    <div className="w-64 bg-[#111827] text-gray-300 min-h-screen flex flex-col shadow-xl">
+    <div className="w-64 bg-[#111827] text-gray-300 h-screen flex flex-col shadow-xl sticky top-0">
 
       {/* Header */}
       <div className="p-6 border-b border-gray-700">
