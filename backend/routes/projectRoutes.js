@@ -20,6 +20,6 @@ router.put("/:id", protect, adminOnly, updateProject);
 router.delete("/:id", protect, adminOnly, deleteProject);
 
 // 🔹 Member + Admin: view assigned projects
-router.get("/", protect, getProjectsForMember);
+router.get("/my-projects", protect, getProjectsForMember);
 
 export default router;
