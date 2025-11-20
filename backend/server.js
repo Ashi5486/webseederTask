@@ -17,10 +17,13 @@ const app = express();
 connectDB();
 
 app.use(cors({
-  origin: "*",
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: [
+    "http://localhost:5173",
+    "https://webseedertask.onrender.com"
+  ],
   credentials: true,
 }));
+
 app.use(express.json());
 
 const _dirname = path.resolve();
